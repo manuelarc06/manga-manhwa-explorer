@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="Discover manga and manhwa, search for titles, explore genres, and find your next favorite story.">
+
+    <meta name="author" content="Manuela Alejandra Rodriguez Cardenas">
+
+    <title>Manga & Manhwa Explorer</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar" aria-label="Main navigation">
+
+            <a href="index.html" class="logo">
+                <img src="images/gato.png" alt="" class="logo-image">
+            
+                <span>
+                    Manga & Manhwa Explorer
+                </span>
+            </a>
+
+
+            <button type="button" class="menu-button" id="menu-button" aria-label="Open navigation menu"
+                aria-expanded="false" aria-controls="nav-links">
+                ☰
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+
+                <li>
+                    <a href="index.html" aria-current="page">
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a href="search/">
+                        Explore
+                    </a>
+                </li>
+
+                <li>
+                    <a href="favorites/">
+                        Favorites
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="hero" aria-labelledby="hero-heading">
+
+            <div class="hero-content">
+
+                <div class="hero-text">
+
+                    <p class="eyebrow">
+                        Discover your next favorite
+                    </p>
+
+                    <h1 id="hero-heading">
+                        Manga & Manhwa Explorer
+                    </h1>
+
+                    <p>
+                        Search, discover, and explore manga and manhwa
+                        in one place.
+                    </p>
+
+                    <form class="search-form" id="search-form">
+
+                        <label for="search-input" class="sr-only">
+                            Search manga or manhwa
+                        </label>
+
+                        <input type="search" id="search-input" name="search" placeholder="Search manga and manhwa..."
+                            autocomplete="off" required>
+
+                        <button type="submit">
+                            Search
+                        </button>
+
+                    </form>
+
+                    <button type="button" id="random-button" class="random-button">
+                        Random Title
+                    </button>
+
+                </div>
+
+                <div class="hero-image">
+
+                    <img id="hero-image" class="hero-cat" src="/images/gato.png" alt="Cute manga illustration" width="260" height="360">
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="featured-section" aria-labelledby="featured-heading">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">
+                    Explore
+                </p>
+
+                <h2 id="featured-heading">
+                    Featured Titles
+                </h2>
+
+                <p>
+                    Discover popular manga and manhwa selected from
+                    the Nozu API.
+                </p>
+
+            </div>
+
+            <div id="featured-manga" class="manga-grid" aria-live="polite">
+                <p class="status-message">
+                    Loading manga...
+                </p>
+            </div>
+
+        </section>
+
+        <section class="featured-section" aria-labelledby="genres-heading">
+        
+            <div class="section-heading">
+        
+                <p class="eyebrow">
+                    Browse
+                </p>
+        
+                <h2 id="genres-heading">
+                    Explore by Genre
+                </h2>
+        
+                <p>
+                    Choose a genre and discover manga that matches
+                    your interests.
+                </p>
+        
+            </div>
+        
+            <div id="genre-list" class="genre-list" aria-label="Manga genres">
+        
+                <button type="button" data-genre="Aksiyon">
+                    Action
+                </button>
+        
+                <button type="button" data-genre="Macera">
+                    Adventure
+                </button>
+        
+                <button type="button" data-genre="Komedi">
+                    Comedy
+                </button>
+        
+                <button type="button" data-genre="Dram">
+                    Drama
+                </button>
+        
+                <button type="button" data-genre="Fantastik">
+                    Fantasy
+                </button>
+        
+                <button type="button" data-genre="Romantik">
+                    Romance
+                </button>
+        
+                <button type="button" data-genre="Korku">
+                    Horror
+                </button>
+        
+                <button type="button" data-genre="Gizem">
+                    Mystery
+                </button>
+        
+            </div>
+        
+            <p id="genre-status" class="status-message" aria-live="polite"></p>
+        
+            <div id="genre-results" class="manga-grid" aria-live="polite"></div>
+        
+        </section>
+
+
+
+    </main>
+
+    <footer>
+
+        <p>
+            &copy; 2026 Manga & Manhwa Explorer
+        </p>
+
+    </footer>
+
+    <script type="module" src="js/navigation.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/genres.js"></script>
+
+</body>
+
+</html>

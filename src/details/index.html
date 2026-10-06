@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="View detailed information about a manga or manhwa.">
+
+    <title>Manga Details | Manga & Manhwa Explorer</title>
+
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/animations.css">
+</head>
+
+<body>
+
+    <header>
+
+        <nav class="navbar" aria-label="Main navigation">
+
+            <a href="index.html" class="logo">
+                <img src="../images/gato.png" alt="" class="logo-image">
+            
+                <span>
+                    Manga & Manhwa Explorer
+                </span>
+            </a>
+
+            <button type="button" class="menu-button" id="menu-button" aria-label="Open navigation menu"
+                aria-expanded="false" aria-controls="nav-links">
+                ☰
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+
+                <li>
+                    <a href="../index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="../search/">Explore</a>
+                </li>
+
+                <li>
+                    <a href="../favorites/">Favorites</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <section class="featured-section" aria-labelledby="details-heading">
+
+            <p id="details-status" class="status-message" aria-live="polite">
+                Loading manga details...
+            </p>
+
+            <article id="manga-details">
+            </article>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <p>
+            &copy; 2026 Manga & Manhwa Explorer
+        </p>
+
+    </footer>
+
+    <script type="module" src="../js/navigation.js"></script>
+    <script type="module" src="../js/details.js"></script>
+
+</body>
+
+</html>
