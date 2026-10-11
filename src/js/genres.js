@@ -1,157 +1,190 @@
-import {
-    searchMangaByGenre,
-    getMangaItems,
-} from './api.js';
+import { searchMangaByGenre, getMangaItems, } from './api.js';
 
-const genreList =
-    document.querySelector('#genre-list');
+const genreList = document.querySelector('#genre-list');
+const genreResults = document.querySelector('#genre-results');
+const genreStatus = document.querySelector('#genre-status');
+const genrePagination = document.querySelector('#genre-pagination');
 
-const genreResults =
-    document.querySelector('#genre-results');
+const isGenrePage = Boolean(genrePagination);
 
-const genreStatus =
-    document.querySelector('#genre-status');
+const PAGE_SIZE = 12;
+
+let requestId = 0;
+let currentGenre = '';
+let currentPage = 1;
 
 /**
- * Get the best available manga title.
- *
- * @param {Object} manga - Manga object from Nozu.
- * @returns {string} Manga title.
+ * Genre labels shown to users.
+ * The values sent to Nozu remain separate.
  */
+const GENRES = [
+    { value: 'Aksiyon', label: 'Action' },
+    { value: 'Macera', label: 'Adventure' },
+    { value: 'Komedi', label: 'Comedy' },
+    { value: 'Dram', label: 'Drama' },
+    { value: 'Fantastik', label: 'Fantasy' },
+    { value: 'Romantik', label: 'Romance' },
+    { value: 'Korku', label: 'Horror' },
+    { value: 'Gizem', label: 'Mystery' },
+];
+
 function getMangaTitle(manga) {
-    if (typeof manga.title === 'string') {
+    if (typeof manga?.title === 'string') {
         return manga.title;
     }
 
     return (
-        manga.title?.english ||
-        manga.title?.romaji ||
-        manga.title?.native ||
+        manga?.title?.english ||
+        manga?.title?.romaji ||
+        manga?.title?.native ||
+        manga?.name ||
         'Unknown title'
     );
 }
 
-/**
- * Get a safe manga image URL.
- *
- * @param {Object} manga - Manga object from Nozu.
- * @returns {string} Image URL.
- */
 function getMangaImage(manga) {
-    return (
-        manga.cover_image ||
-        manga.coverImage ||
-        manga.image ||
-        ''
-    );
+    const image =
+        manga?.cover_image ||
+        manga?.coverImage ||
+        manga?.image ||
+        '';
+
+    if (typeof image !== 'string') {
+        return '';
+    }
+
+    try {
+        const url = new URL(image, window.location.href);
+
+        if (!['http:', 'https:'].includes(url.protocol)) {
+            return '';
+        }
+
+        return url.href;
+    } catch {
+        return '';
+    }
 }
 
-/**
- * Create a manga card.
- *
- * @param {Object} manga - Manga object from Nozu.
- * @returns {HTMLElement} Manga card.
- */
-function createMangaCard(manga) {
-    const article =
-        document.createElement('article');
+function createImageFallback(title) {
+    const placeholder = document.createElement('div');
 
+    placeholder.className = 'image-placeholder';
+    placeholder.setAttribute('role', 'img');
+    placeholder.setAttribute(
+        'aria-label',
+        `No cover image available for ${title}`
+    );
+    placeholder.textContent = 'Cover unavailable';
+
+    return placeholder;
+}
+
+function createMangaCard(manga) {
+    const article = document.createElement('article');
     article.className = 'manga-card';
 
-    const title =
-        getMangaTitle(manga);
-
-    const image =
-        getMangaImage(manga);
-
-    const score =
-        manga.average_score ??
-        manga.mean_score;
-
-    const genres =
-        Array.isArray(manga.genres) &&
-            manga.genres.length
-            ? manga.genres
-                .slice(0, 2)
-                .join(', ')
-            : 'Genre unavailable';
-
-    const year =
-        manga.start_year ||
-        'Year unavailable';
-
-    const slug =
-        manga.slug || '';
-
-    const imageMarkup = image
-        ? `
-            <img
-                src="${image}"
-                alt="Cover of ${title}"
-                loading="lazy"
-            >
-        `
-        : `
-            <div
-                class="image-placeholder"
-                role="img"
-                aria-label="No cover image available"
-            >
-                Cover unavailable
-            </div>
-        `;
-
-    const linkMarkup = slug
-        ? `
-            <a
-                class="manga-card-link"
-                href="details/?slug=${encodeURIComponent(slug)}"
-            >
-                View Details
-            </a>
-        `
+    const title = getMangaTitle(manga);
+    const slug = typeof manga?.slug === 'string'
+        ? manga.slug
         : '';
 
-    article.innerHTML = `
-        ${imageMarkup}
+    const score =
+        manga?.average_score ??
+        manga?.mean_score;
 
-        <div class="manga-card-content">
+    const genres = Array.isArray(manga?.genres)
+        ? manga.genres
+            .slice(0, 2)
+            .map((genre) => {
+                if (typeof genre === 'string') {
+                    return genre;
+                }
 
-            <h3>
-                ${title}
-            </h3>
+                return genre?.name || '';
+            })
+            .filter(Boolean)
+            .join(', ')
+        : '';
 
-            <p>
-                ${score !== undefined &&
-            score !== null
-            ? `⭐ ${score}/100`
-            : '⭐ Not rated'
-        }
-            </p>
+    const year =
+        manga?.start_year ??
+        manga?.start_date ??
+        '';
 
-            <p>
-                ${genres}
-            </p>
+    const imageContainer = document.createElement('div');
+    imageContainer.className = 'manga-card-image';
 
-            <p>
-                ${year}
-            </p>
+    const imageUrl = getMangaImage(manga);
 
-            ${linkMarkup}
+    if (imageUrl) {
+        const image = document.createElement('img');
 
-        </div>
-    `;
+        image.src = imageUrl;
+        image.alt = `Cover of ${title}`;
+        image.loading = 'lazy';
+
+        image.addEventListener('error', () => {
+            image.replaceWith(createImageFallback(title));
+        }, { once: true });
+
+        imageContainer.appendChild(image);
+    } else {
+        imageContainer.appendChild(createImageFallback(title));
+    }
+
+    const content = document.createElement('div');
+    content.className = 'manga-card-content';
+
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    content.appendChild(heading);
+
+    const rating = document.createElement('p');
+
+    rating.textContent =
+        score !== undefined && score !== null && score !== ''
+            ? `Rating: ${score}/100`
+            : 'Rating unavailable';
+
+    content.appendChild(rating);
+
+    if (genres) {
+        const genreText = document.createElement('p');
+        genreText.textContent = genres;
+        content.appendChild(genreText);
+    }
+
+    if (year) {
+        const yearText = document.createElement('p');
+        yearText.textContent = String(year);
+        content.appendChild(yearText);
+    }
+
+    if (slug) {
+        const link = document.createElement('a');
+
+        link.className = 'manga-card-link';
+
+        const detailsPath = isGenrePage
+            ? '../details/index.html'
+            : 'details/index.html';
+
+        link.href =
+            `${detailsPath}?slug=${encodeURIComponent(slug)}`;
+
+        link.textContent = 'View Details';
+
+        content.appendChild(link);
+    }
+
+    article.append(imageContainer, content);
 
     return article;
 }
 
-/**
- * Render manga results.
- *
- * @param {Array} mangaList - Manga results.
- */
-function renderGenreResults(mangaList) {
-    genreResults.innerHTML = '';
+function renderResults(mangaList) {
+    genreResults.replaceChildren();
 
     if (!mangaList.length) {
         genreStatus.textContent =
@@ -160,13 +193,10 @@ function renderGenreResults(mangaList) {
         return;
     }
 
-    const fragment =
-        document.createDocumentFragment();
+    const fragment = document.createDocumentFragment();
 
     mangaList.forEach((manga) => {
-        fragment.appendChild(
-            createMangaCard(manga)
-        );
+        fragment.appendChild(createMangaCard(manga));
     });
 
     genreResults.appendChild(fragment);
@@ -175,88 +205,187 @@ function renderGenreResults(mangaList) {
         `${mangaList.length} manga found.`;
 }
 
-/**
- * Load manga for a selected genre.
- *
- * @param {string} genre - Nozu genre name.
- */
-async function loadGenre(genre) {
-    genreStatus.textContent =
-        'Loading manga...';
+function updateUrl(genre, page) {
+    if (!isGenrePage) {
+        return;
+    }
 
-    genreResults.innerHTML = '';
+    const url = new URL(window.location.href);
+
+    url.searchParams.set('genre', genre);
+    url.searchParams.set('page', String(page));
+
+    window.history.replaceState({}, '', url);
+}
+
+function renderPagination(meta, displayedCount) {
+    if (!genrePagination) {
+        return;
+    }
+
+    genrePagination.replaceChildren();
+
+    const parsedPage = Number(meta?.current_page);
+    const parsedLastPage = Number(meta?.last_page);
+
+    const page = Number.isInteger(parsedPage) && parsedPage > 0
+        ? parsedPage
+        : currentPage;
+
+    const lastPage =
+        Number.isInteger(parsedLastPage) && parsedLastPage > 0
+            ? parsedLastPage
+            : page;
+
+    if (lastPage <= 1) {
+        return;
+    }
+
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.textContent = 'Previous';
+    previous.disabled = page <= 1;
+    previous.addEventListener('click', () => {
+        loadGenre(currentGenre, page - 1);
+    });
+
+    const pageLabel = document.createElement('span');
+    pageLabel.textContent = `Page ${page} of ${lastPage}`;
+
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.textContent = 'Next';
+    next.disabled = page >= lastPage;
+    next.addEventListener('click', () => {
+        loadGenre(currentGenre, page + 1);
+    });
+
+    genrePagination.append(previous, pageLabel, next);
+}
+
+async function loadGenre(genre, page = 1) {
+    if (!genre || !genreResults || !genreStatus) {
+        return;
+    }
+
+    const thisRequest = ++requestId;
+
+    currentGenre = genre;
+    currentPage = page;
+
+    genreStatus.textContent = 'Loading manga...';
+    genreResults.replaceChildren();
+
+    if (genrePagination) {
+        genrePagination.replaceChildren();
+    }
+
+    updateUrl(genre, page);
 
     try {
-        const response =
-            await searchMangaByGenre(
-                genre,
-                1,
-                12
-            );
-
-        const mangaList =
-            getMangaItems(response);
-
-        renderGenreResults(mangaList);
-    } catch (error) {
-        console.error(
-            'Genre search error:',
-            error
+        const response = await searchMangaByGenre(
+            genre,
+            page,
+            PAGE_SIZE
         );
 
+        // Ignore stale responses from earlier selections.
+        if (thisRequest !== requestId) {
+            return;
+        }
+
+        if (response?.success === false) {
+            throw new Error(
+                response.message || 'The genre search failed.'
+            );
+        }
+
+        const mangaList = getMangaItems(response);
+
+        renderResults(mangaList);
+
+        renderPagination(
+            response?.meta,
+            mangaList.length
+        );
+    } catch (error) {
+        if (thisRequest !== requestId) {
+            return;
+        }
+
+        console.error('Genre search error:', error);
+
+        genreResults.replaceChildren();
+
         genreStatus.textContent =
+            error.message ||
             'Unable to load manga for this genre. Please try again later.';
     }
 }
 
-/**
- * Handle genre button clicks.
- *
- * @param {Event} event - Click event.
- */
 function handleGenreClick(event) {
-    const button =
-        event.target.closest(
-            'button[data-genre]'
-        );
+    const button = event.target.closest('button[data-genre]');
 
-    if (!button) {
+    if (!button || !genreList?.contains(button)) {
         return;
     }
 
-    const genre =
-        button.dataset.genre;
+    const genre = button.dataset.genre;
 
     if (!genre) {
         return;
     }
 
-    document
-        .querySelectorAll(
-            '#genre-list button'
-        )
-        .forEach((genreButton) => {
-            genreButton.removeAttribute(
-                'aria-current'
-            );
+    genreList.querySelectorAll('button[data-genre]')
+        .forEach((item) => {
+            item.removeAttribute('aria-current');
         });
 
-    button.setAttribute(
-        'aria-current',
-        'true'
-    );
+    button.setAttribute('aria-current', 'true');
 
-    loadGenre(genre);
+    loadGenre(genre, 1);
 }
 
-if (
-    genreList &&
-    genreResults &&
-    genreStatus
-) {
-    genreList.addEventListener(
-        'click',
-        handleGenreClick
-    );
+function selectGenreButton(genre) {
+    if (!genreList) {
+        return;
+    }
+
+    const buttons = genreList.querySelectorAll('button[data-genre]');
+
+    buttons.forEach((button) => {
+        const selected = button.dataset.genre === genre;
+
+        if (selected) {
+            button.setAttribute('aria-current', 'true');
+        } else {
+            button.removeAttribute('aria-current');
+        }
+    });
+}
+
+if (genreList && genreResults && genreStatus) {
+    genreList.addEventListener('click', handleGenreClick);
+
+    if (isGenrePage) {
+        const params = new URLSearchParams(window.location.search);
+
+        const requestedGenre = params.get('genre');
+        const requestedPage = Number(params.get('page') || 1);
+
+        const validGenre = GENRES.find(
+            (item) => item.value === requestedGenre
+        );
+
+        if (validGenre) {
+            const initialPage =
+                Number.isInteger(requestedPage) && requestedPage > 0
+                    ? requestedPage
+                    : 1;
+
+            selectGenreButton(validGenre.value);
+            loadGenre(validGenre.value, initialPage);
+        }
+    }
 }
 

@@ -24,7 +24,7 @@
 
         <nav class="navbar" aria-label="Main navigation">
 
-            <a href="index.html" class="logo">
+            <a href="../index.html" class="logo">
                 <img src="../images/gato.png" alt="" class="logo-image">
             
                 <span>
@@ -40,21 +40,19 @@
             <ul class="nav-links" id="nav-links">
 
                 <li>
-                    <a href="../index.html">
-                        Home
-                    </a>
+                    <a href="../index.html">Home</a>
                 </li>
 
                 <li>
-                    <a href="index.html" aria-current="page">
-                        Explore
-                    </a>
+                    <a href="index.html" aria-current="page">Explore</a>
                 </li>
 
                 <li>
-                    <a href="../favorites/index.html">
-                        Favorites
-                    </a>
+                    <a href="../genres/">Genres</a>
+                </li>
+
+                <li>
+                    <a href="../favorites/index.html">Favorites</a>
                 </li>
 
             </ul>
@@ -69,38 +67,26 @@
 
             <div class="section-heading">
 
-                <p class="eyebrow">
-                    Explore
-                </p>
+                <p class="eyebrow">Explore</p>
 
-                <h1 id="search-heading">
-                    Search Manga & Manhwa
-                </h1>
+                <h1 id="search-heading">Search Manga & Manhwa</h1>
 
-                <p>
-                    Search for your next manga or manhwa to read.
-                </p>
+                <p>Search for your next manga or manhwa to read.</p>
 
             </div>
 
             <form class="search-form" id="search-form">
 
-                <label for="search-input" class="sr-only">
-                    Search manga or manhwa
-                </label>
+                <label for="search-input" class="sr-only">Search manga or manhwa</label>
 
                 <input type="search" id="search-input" name="search" placeholder="Search by title..." autocomplete="off"
                     required>
 
-                <button type="submit">
-                    Search
-                </button>
+                <button type="submit">Search</button>
 
             </form>
 
-            <p id="search-status" class="status-message" aria-live="polite">
-                Enter a title to search.
-            </p>
+            <p id="search-status" class="status-message" aria-live="polite">Enter a title to search.</p>
 
             <div id="search-results" class="manga-grid" aria-live="polite"></div>
 

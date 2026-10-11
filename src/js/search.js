@@ -1,21 +1,13 @@
-import {
-    searchManga,
-    getMangaItems,
-} from './api.js';
+import { searchManga, getMangaItems, } from './api.js';
 
-const searchForm =
-    document.querySelector('#search-form');
-
-const searchInput =
-    document.querySelector('#search-input');
-
-const searchResults =
-    document.querySelector('#search-results');
-
-const searchStatus =
-    document.querySelector('#search-status');
+const searchForm = document.querySelector('#search-form');
+const searchInput = document.querySelector('#search-input');
+const searchResults = document.querySelector('#search-results');
+const searchStatus = document.querySelector('#search-status');
+const searchPagination = document.querySelector('#search-pagination');
 
 let currentPage = 1;
+let latestSearchRequest = 0;
 
 const RESULTS_PER_PAGE = 12;
 
@@ -205,23 +197,36 @@ function createMangaCard(manga) {
     content.className =
         'manga-card-content';
 
-    content.innerHTML = `
-        <h2>${title}</h2>
+    const heading = document.createElement('h2');
+    heading.textContent = title;
 
-        <p>
-            <span aria-hidden="true">⭐</span>
-            <span class="sr-only">Rating:</span>
-            ${score}
-        </p>
+    const rating = document.createElement('p');
 
-        <p>
-            ${genres}
-        </p>
+    const star = document.createElement('span');
+    star.setAttribute('aria-hidden', 'true');
+    star.textContent = '⭐';
 
-        <p>
-            ${year}
-        </p>
-    `;
+    const ratingLabel = document.createElement('span');
+    ratingLabel.className = 'sr-only';
+    ratingLabel.textContent = 'Rating: ';
+
+    rating.append(star, ratingLabel);
+    rating.append(
+        document.createTextNode(` ${score}`)
+    );
+
+    const genreText = document.createElement('p');
+    genreText.textContent = genres;
+
+    const yearText = document.createElement('p');
+    yearText.textContent = year;
+
+    content.append(
+        heading,
+        rating,
+        genreText,
+        yearText
+    );
 
     if (slug) {
         const link =
@@ -400,75 +405,87 @@ function renderSearchResults(
  * @param {string} query - Search query.
  * @param {number} page - Page number.
  */
-async function performSearch(
-    query,
-    page = 1
-) {
-    if (!query) {
+async function performSearch(query, page = 1) {
+    const requestId = ++latestSearchRequest;
+
+    const cleanQuery = query.trim();
+
+    if (!cleanQuery) {
         searchStatus.textContent =
             'Please enter a manga title.';
 
-        searchResults.innerHTML = '';
+        searchResults.replaceChildren();
+        searchPagination?.replaceChildren();
 
         return;
     }
 
     currentPage = page;
 
-    searchStatus.textContent =
-        'Searching...';
+    searchStatus.textContent = 'Searching...';
+    searchResults.replaceChildren();
+    searchPagination?.replaceChildren();
 
-    searchResults.innerHTML = '';
+    // Keep the search query and page synchronized with the URL.
+    const params = new URLSearchParams();
+    params.set('q', cleanQuery);
+    params.set('page', String(page));
 
-    const pagination =
-        document.querySelector(
-            '#search-pagination'
-        );
-
-    if (pagination) {
-        pagination.innerHTML = '';
-    }
+    window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}?${params.toString()}`
+    );
 
     try {
-        const response =
-            await searchManga(
-                query,
-                page,
-                RESULTS_PER_PAGE
-            );
-
-        const mangaList =
-            getMangaItems(response);
-
-        renderSearchResults(
-            mangaList,
-            response
+        const response = await searchManga(
+            cleanQuery,
+            page,
+            RESULTS_PER_PAGE
         );
+
+        // Ignore responses from older searches.
+        if (requestId !== latestSearchRequest) {
+            return;
+        }
+
+        const mangaList = getMangaItems(response);
+
+        renderSearchResults(mangaList, response);
     } catch (error) {
-        console.error(
-            'Search error:',
-            error
-        );
+        // Do not let an older failed request replace newer results.
+        if (requestId !== latestSearchRequest) {
+            return;
+        }
+
+        console.error('Search error:', error);
 
         searchStatus.textContent =
             'Unable to search manga right now. Please try again later.';
 
-        searchResults.innerHTML = '';
+        searchResults.replaceChildren();
+        searchPagination?.replaceChildren();
     }
 }
 
-/**
- * Get the initial search query from the URL.
- *
- * @returns {string} Search query.
- */
 function getInitialQuery() {
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
     return params.get('q')?.trim() || '';
+}
+
+function getInitialPage() {
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const page = Number(params.get('page'));
+
+    return Number.isSafeInteger(page) && page > 0
+        ? page
+        : 1;
 }
 
 if (
@@ -512,16 +529,12 @@ if (
         }
     );
 
-    const initialQuery =
-        getInitialQuery();
+    const initialQuery = getInitialQuery();
+    const initialPage = getInitialPage();
 
     if (initialQuery) {
-        searchInput.value =
-            initialQuery;
+        searchInput.value = initialQuery;
 
-        performSearch(
-            initialQuery,
-            1
-        );
+        performSearch(initialQuery, initialPage);
     }
 }

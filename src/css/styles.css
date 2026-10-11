@@ -532,6 +532,120 @@ footer {
     outline-offset: 3px;
 }
 
+#recent-manga {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 1.5rem;
+}
+
+#recent-manga .recently-viewed-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-self: stretch;
+    height: 100%;
+}
+
+#recent-manga .manga-card-image {
+    aspect-ratio: 2 / 3;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+#recent-manga .manga-card-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+#recent-manga .manga-card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+#recent-manga .manga-card h3 {
+    overflow-wrap: anywhere;
+}
+
+.genre-page {
+    min-height: 60vh;
+}
+
+.genre-page .section-heading {
+    max-width: 760px;
+}
+
+.genre-list button[aria-current="true"] {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+.genre-page .manga-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.genre-page .manga-card-image {
+    aspect-ratio: 2 / 3;
+    flex-shrink: 0;
+}
+
+.genre-page .manga-card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.genre-page .manga-card h3 {
+    overflow-wrap: anywhere;
+}
+
+.genre-page .manga-card-link {
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: 0.75rem;
+}
+
+.genre-page .image-placeholder,
+.genre-page .manga-card-image .image-placeholder {
+    align-items: center;
+    aspect-ratio: 2 / 3;
+    background-color: var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    width: 100%;
+}
+
+.genre-page .pagination {
+    flex-wrap: wrap;
+}
+
+.genre-page-link {
+    margin: 1rem 0 2rem;
+}
+
+.genre-page-link a {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.genre-page-link a:hover {
+    color: var(--secondary-color);
+}
+
 @media (max-width: 700px) {
     .menu-button {
         display: block;
@@ -629,5 +743,36 @@ footer {
     
     .details-metadata {
         text-align: left;
+    }
+
+    #recent-manga {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .genre-page .genre-list {
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .genre-page .genre-list button {
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .genre-page .manga-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    
+    .genre-page .manga-card-content {
+        padding: 0.75rem;
+    }
+    
+    .genre-page .pagination {
+        gap: 0.5rem;
+    }
+    
+    .genre-page .pagination button {
+        padding: 0.5rem 0.7rem;
     }
 }

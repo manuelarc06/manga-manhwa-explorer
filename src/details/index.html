@@ -5,26 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="View detailed information about a manga or manhwa.">
+    <meta name="description"
+        content="Explore detailed manga and manhwa information, characters, genres, staff, recommendations and related titles.">
+
+    <meta name="theme-color" content="#15121f">
 
     <title>Manga Details | Manga & Manhwa Explorer</title>
 
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/details.css">
 </head>
 
 <body>
 
     <header>
-
         <nav class="navbar" aria-label="Main navigation">
 
-            <a href="index.html" class="logo">
+            <a href="../index.html" class="logo">
                 <img src="../images/gato.png" alt="" class="logo-image">
-            
-                <span>
-                    Manga & Manhwa Explorer
-                </span>
+
+                <span>Manga &amp; Manhwa Explorer</span>
             </a>
 
             <button type="button" class="menu-button" id="menu-button" aria-label="Open navigation menu"
@@ -33,46 +34,29 @@
             </button>
 
             <ul class="nav-links" id="nav-links">
-
-                <li>
-                    <a href="../index.html">Home</a>
-                </li>
-
-                <li>
-                    <a href="../search/">Explore</a>
-                </li>
-
-                <li>
-                    <a href="../favorites/">Favorites</a>
-                </li>
-
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../search/">Explore</a></li>
+                <li><a href="../genres/">Genres</a></li>
+                <li><a href="../favorites/">Favorites</a></li>
             </ul>
 
         </nav>
-
     </header>
 
-    <main>
+    <main class="details-page">
 
-        <section class="featured-section" aria-labelledby="details-heading">
+        <p id="details-status" class="status-message" role="status" aria-live="polite">Loading manga details...</p>
 
-            <p id="details-status" class="status-message" aria-live="polite">
-                Loading manga details...
-            </p>
+        <div id="details-error" class="details-error" role="alert" hidden>
+        </div>
 
-            <article id="manga-details">
-            </article>
-
-        </section>
+        <article id="manga-details" aria-live="polite">
+        </article>
 
     </main>
 
     <footer>
-
-        <p>
-            &copy; 2026 Manga & Manhwa Explorer
-        </p>
-
+        <p>&copy; 2026 Manga &amp; Manhwa Explorer</p>
     </footer>
 
     <script type="module" src="../js/navigation.js"></script>

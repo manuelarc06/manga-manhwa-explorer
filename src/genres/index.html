@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Explore manga and manhwa by genre.">
+
+    <title>Explore Genres | Manga & Manhwa Explorer</title>
+
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/animations.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar" aria-label="Main navigation">
+
+            <a href="../index.html" class="logo">
+                <img src="../images/gato.png" alt="" class="logo-image">
+                <span>Manga & Manhwa Explorer</span>
+            </a>
+
+            <button type="button" class="menu-button" id="menu-button" aria-label="Open navigation menu"
+                aria-expanded="false" aria-controls="nav-links">
+                ☰
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li>
+                    <a href="../index.html">Home</a>
+                </li>
+                <li>
+                    <a href="../search/index.html">Explore</a>
+                </li>
+                <li>
+                    <a href="index.html" aria-current="page">Genres</a>
+                </li>
+                <li>
+                    <a href="../favorites/index.html">Favorites</a>
+                </li>
+            </ul>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="featured-section genre-page" aria-labelledby="genres-heading">
+
+            <div class="section-heading">
+                <p class="eyebrow">Discover your next story</p>
+
+                <h1 id="genres-heading">Explore by Genre</h1>
+
+                <p>Choose a genre to discover manga and manhwa that match your interests.</p>
+            </div>
+
+            <div id="genre-list" class="genre-list" aria-label="Available manga genres">
+                <button type="button" data-genre="Aksiyon">Action</button>
+                <button type="button" data-genre="Macera">Adventure</button>
+                <button type="button" data-genre="Komedi">Comedy</button>
+                <button type="button" data-genre="Dram">Drama</button>
+                <button type="button" data-genre="Fantastik">Fantasy</button>
+                <button type="button" data-genre="Romantik">Romance</button>
+                <button type="button" data-genre="Korku">Horror</button>
+                <button type="button" data-genre="Gizem">Mystery</button>
+            </div>
+
+            <p id="genre-status" class="status-message" role="status" aria-live="polite">Select a genre to get started.</p>
+
+            <div id="genre-results" class="manga-grid" aria-live="polite"></div>
+
+            <nav id="genre-pagination" class="pagination" aria-label="Genre result pages"></nav>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Manga & Manhwa Explorer</p>
+    </footer>
+
+    <script type="module" src="../js/navigation.js"></script>
+    <script type="module" src="../js/genres.js"></script>
+
+</body>
+
+</html>

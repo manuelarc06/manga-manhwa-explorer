@@ -1,37 +1,26 @@
-import {
-    getPopularManga,
-    getRandomManga,
-    getMangaItems,
-} from './api.js';
+import { getPopularManga, getRandomManga, getMangaItems, } from './api.js';
+import { getRecentlyViewed, } from './storage.js';
 
-const featuredManga =
-    document.querySelector('#featured-manga');
+const featuredManga = document.querySelector('#featured-manga');
+const randomButton = document.querySelector('#random-button');
+const searchForm = document.querySelector('#search-form');
+const searchInput = document.querySelector('#search-input');
 
-const randomButton =
-    document.querySelector('#random-button');
+const recentMangaContainer = document.querySelector('#recent-manga');
+const recentStatus = document.querySelector('#recent-status');
 
-const searchForm =
-    document.querySelector('#search-form');
-
-const searchInput =
-    document.querySelector('#search-input');
-
-/**
- * Get the best available manga title.
- *
- * @param {Object} manga - Manga object.
- * @returns {string} Manga title.
- */
 function getMangaTitle(manga) {
-    if (typeof manga.title === 'string') {
-        return manga.title;
+    const title = manga?.title;
+
+    if (typeof title === 'string' && title.trim()) {
+        return title.trim();
     }
 
     return (
-        manga.title?.english ||
-        manga.title?.romaji ||
-        manga.title?.native ||
-        manga.name ||
+        title?.english ||
+        title?.romaji ||
+        title?.native ||
+        manga?.name ||
         'Unknown title'
     );
 }
@@ -273,6 +262,51 @@ function renderManga(mangaList) {
 }
 
 /**
+ * Display recently viewed manga.
+ */
+function renderRecentlyViewed() {
+    if (!recentMangaContainer || !recentStatus) {
+        return;
+    }
+
+    const recentManga = getRecentlyViewed();
+
+    recentMangaContainer.innerHTML = '';
+
+    if (!recentManga.length) {
+        recentStatus.textContent =
+            'You have not viewed any titles yet.';
+
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    recentManga.forEach((manga) => {
+        const card = createMangaCard(manga);
+
+        card.classList.add('recently-viewed-card');
+
+        fragment.appendChild(card);
+    });
+
+    recentMangaContainer.appendChild(fragment);
+
+    recentStatus.textContent =
+        `${recentManga.length} recently viewed title(s).`;
+}
+
+/**
+ * Refresh recently viewed titles when the page
+ * becomes visible again.
+ */
+function handlePageVisibility() {
+    if (!document.hidden) {
+        renderRecentlyViewed();
+    }
+}
+
+/**
  * Load popular manga.
  */
 async function loadManga() {
@@ -384,3 +418,9 @@ searchForm?.addEventListener(
 );
 
 loadManga();
+
+renderRecentlyViewed();
+
+document.addEventListener('visibilitychange', handlePageVisibility);
+
+window.addEventListener('pageshow',  renderRecentlyViewed);

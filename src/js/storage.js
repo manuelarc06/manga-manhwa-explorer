@@ -1,83 +1,103 @@
 const FAVORITES_KEY = 'mangaExplorerFavorites';
 const RECENT_KEY = 'mangaExplorerRecentlyViewed';
+const MAX_RECENT_TITLES = 5;
 
 /**
- * Get saved favorites from localStorage.
+ * Read an array from localStorage safely.
  *
- * @returns {Array} Favorite manga.
+ * @param {string} key - Storage key.
+ * @returns {Array} Stored items or an empty array.
  */
-export function getFavorites() {
+function readStorage(key) {
     try {
-        const favorites =
-            localStorage.getItem(FAVORITES_KEY);
+        const value = localStorage.getItem(key);
 
-        return favorites
-            ? JSON.parse(favorites)
-            : [];
+        if (!value) {
+            return [];
+        }
+
+        const parsed = JSON.parse(value);
+
+        return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
-        console.error(
-            'Could not load favorites:',
-            error
-        );
-
+        console.error(`Could not read ${key}:`, error);
         return [];
     }
 }
 
 /**
- * Save favorites to localStorage.
+ * Save an array to localStorage safely.
  *
- * @param {Array} favorites - Favorite manga.
+ * @param {string} key - Storage key.
+ * @param {Array} items - Items to save.
+ * @returns {boolean} Whether the save succeeded.
  */
-function saveFavorites(favorites) {
-    localStorage.setItem(
-        FAVORITES_KEY,
-        JSON.stringify(favorites)
-    );
-}
-
-/**
- * Add manga to favorites.
- *
- * @param {Object} manga - Manga object.
- */
-export function addFavorite(manga) {
-    const favorites = getFavorites();
-
-    const exists = favorites.some(
-        (favorite) =>
-            favorite.slug === manga.slug
-    );
-
-    if (!exists) {
-        favorites.push(manga);
-        saveFavorites(favorites);
+function writeStorage(key, items) {
+    try {
+        localStorage.setItem(key, JSON.stringify(items));
+        return true;
+    } catch (error) {
+        console.error(`Could not save ${key}:`, error);
+        return false;
     }
 }
 
 /**
- * Remove manga from favorites.
+ * Get saved favorites.
  *
- * @param {string} slug - Nozu manga slug.
+ * @returns {Array} Favorite manga.
+ */
+export function getFavorites() {
+    return readStorage(FAVORITES_KEY);
+}
+
+/**
+ * Add a manga to favorites without duplicates.
+ *
+ * @param {Object} manga - Manga object.
+ * @returns {boolean} Whether the save succeeded.
+ */
+export function addFavorite(manga) {
+    if (!manga?.slug) {
+        return false;
+    }
+
+    const favorites = getFavorites();
+    const exists = favorites.some(
+        (item) => item.slug === manga.slug
+    );
+
+    if (exists) {
+        return true;
+    }
+
+    favorites.push(manga);
+    return writeStorage(FAVORITES_KEY, favorites);
+}
+
+/**
+ * Remove a manga from favorites.
+ *
+ * @param {string} slug - Manga slug.
+ * @returns {boolean} Whether the save succeeded.
  */
 export function removeFavorite(slug) {
-    const favorites =
-        getFavorites().filter(
-            (manga) => manga.slug !== slug
-        );
+    const favorites = getFavorites().filter(
+        (item) => item.slug !== slug
+    );
 
-    saveFavorites(favorites);
+    return writeStorage(FAVORITES_KEY, favorites);
 }
 
 /**
  * Check whether a manga is a favorite.
  *
- * @param {string} slug - Nozu manga slug.
- * @returns {boolean} Whether manga is favorite.
+ * @param {string} slug - Manga slug.
+ * @returns {boolean} Whether it is a favorite.
  */
 export function isFavorite(slug) {
     return getFavorites().some(
-        (manga) => manga.slug === slug
+        (item) => item.slug === slug
     );
 }
 
@@ -87,44 +107,29 @@ export function isFavorite(slug) {
  * @returns {Array} Recently viewed manga.
  */
 export function getRecentlyViewed() {
-    try {
-        const recent =
-            localStorage.getItem(RECENT_KEY);
-
-        return recent
-            ? JSON.parse(recent)
-            : [];
-    } catch (error) {
-        console.error(
-            'Could not load recently viewed manga:',
-            error
-        );
-
-        return [];
-    }
+    return readStorage(RECENT_KEY);
 }
 
 /**
  * Save a recently viewed manga.
+ * The newest title appears first and duplicates are removed.
  *
  * @param {Object} manga - Manga object.
+ * @returns {boolean} Whether the save succeeded.
  */
 export function addRecentlyViewed(manga) {
-    let recent =
-        getRecentlyViewed();
+    if (!manga?.slug) {
+        return false;
+    }
 
-    recent = recent.filter(
-        (item) =>
-            item.slug !== manga.slug
+    const recent = getRecentlyViewed().filter(
+        (item) => item.slug !== manga.slug
     );
 
     recent.unshift(manga);
 
-    recent =
-        recent.slice(0, 5);
-
-    localStorage.setItem(
+    return writeStorage(
         RECENT_KEY,
-        JSON.stringify(recent)
+        recent.slice(0, MAX_RECENT_TITLES)
     );
 }
