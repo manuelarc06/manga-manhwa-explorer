@@ -197,29 +197,6 @@ function renderSection(title, content, id = '') {
     `;
 }
 
-function renderPills(values, translate = false) {
-    const items = getArray(values);
-
-    if (!items.length) {
-        return '<p class="details-muted">Not available.</p>';
-    }
-
-    return `
-        <div class="details-pills">
-            ${items.map((item) => {
-        const label = translate
-            ? translateGenre(item)
-            : item;
-
-        return `
-                    <span class="details-pill">
-                        ${escapeHTML(label)}
-                    </span>
-                `;
-    }).join('')}
-        </div>
-    `;
-}
 
 function renderFavoriteButton(manga) {
     const slug = manga.slug;
@@ -1007,8 +984,6 @@ async function loadDetails() {
         }
 
         currentManga = manga;
-
-        console.log('Nozu manga details:', manga);
 
         let metadata = null;
 

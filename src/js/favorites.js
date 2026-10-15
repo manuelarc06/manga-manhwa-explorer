@@ -1,13 +1,8 @@
-import {
-    getFavorites,
-    removeFavorite,
-} from './storage.js';
+import { getFavorites, removeFavorite, } from './storage.js';
 
-const favoritesList =
-    document.querySelector('#favorites-list');
+const favoritesList = document.querySelector('#favorites-list');
 
-const favoritesStatus =
-    document.querySelector('#favorites-status');
+const favoritesStatus = document.querySelector('#favorites-status');
 
 /**
  * Create an image fallback when the cover cannot be loaded.

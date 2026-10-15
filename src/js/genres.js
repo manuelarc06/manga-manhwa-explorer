@@ -218,7 +218,7 @@ function updateUrl(genre, page) {
     window.history.replaceState({}, '', url);
 }
 
-function renderPagination(meta, displayedCount) {
+function renderPagination(meta) {
     if (!genrePagination) {
         return;
     }
@@ -304,10 +304,7 @@ async function loadGenre(genre, page = 1) {
 
         renderResults(mangaList);
 
-        renderPagination(
-            response?.meta,
-            mangaList.length
-        );
+        renderPagination(response?.meta);
     } catch (error) {
         if (thisRequest !== requestId) {
             return;

@@ -1,12 +1,9 @@
 const NOZU_API = 'https://nozu.me/api/v1';
-const RAPIDAPI_BASE_URL =
-    'https://anime-manga-and-novels-api.p.rapidapi.com';
+const RAPIDAPI_BASE_URL = 'https://anime-manga-and-novels-api.p.rapidapi.com';
 
-const RAPIDAPI_HOST =
-    'anime-manga-and-novels-api.p.rapidapi.com';
+const RAPIDAPI_HOST = 'anime-manga-and-novels-api.p.rapidapi.com';
 
-const RAPIDAPI_KEY =
-    import.meta.env.VITE_RAPIDAPI_KEY;
+const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
 /**
  * Fetch data from an API.
